@@ -38,8 +38,6 @@ struct MP3File {
     char* data;
 };
 
-#pragma pack(pop)
-
 unsigned int getSize(unsigned sizeBytes) {
     return ((sizeBytes >> 24) & 0x000000ff) | ((sizeBytes >> 8) & 0x0000ff00) | ((sizeBytes << 8) & 0x00ff0000) | ((sizeBytes << 24) & 0xff000000);
 }
@@ -102,24 +100,14 @@ short rewriteMP3 (struct MP3File* mp3) {
     }
     for (int i = 0; i < mp3->frameAmount; i++) {
         fwrite(mp3->frames[i]->frameHeader, sizeof(struct FrameHeader), 1, file);
-        fwrite(mp3->frames[i]->frameData,  getSize(mp3->frames[i]->frameHeader->sizeBytes), 1, file);
+        fwrite(mp3->frames[i]->frameData,  1, getSize(mp3->frames[i]->frameHeader->sizeBytes), file);
     }
     fwrite(mp3->data, 1, mp3->dataSize, file);
     fclose(file);
+    return 1;
 }
 
-void freeMP3 (struct MP3File* mp3) {
-    free(mp3->header);
-    free(mp3->extendedHeader);
-    for (int i = 0; i < mp3->frameAmount; i++) {
-        free(mp3->frames[i]->frameHeader);
-        free(mp3->frames[i]->frameData);
-        free(mp3->frames[i]);
-    }
-    free(mp3->frames);
-    free(mp3->data);
-    free(mp3);
-}
+#pragma pack(pop)
 
 void printFrameInf(struct Frame* frame) {
     for (int i = 0; i < getSize(frame->frameHeader->sizeBytes); i++) {
@@ -132,9 +120,11 @@ void printFrameInf(struct Frame* frame) {
 
 void showFrames(struct MP3File* mp3) {
     for (int i = 0; i < mp3->frameAmount; i++) {
-        printf("%s:\t", mp3->frames[i]->frameHeader->frameID);
-        if (getSize(mp3->frames[i]->frameHeader->sizeBytes) <= 100) {
-            printFrameInf(mp3->frames[i]);
+        if (strlen(mp3->frames[i]->frameHeader->frameID) == 4) {
+            printf("%s:\t", mp3->frames[i]->frameHeader->frameID);
+            if (getSize(mp3->frames[i]->frameHeader->sizeBytes) <= 100) {
+                printFrameInf(mp3->frames[i]);
+            }
         }
     }
 }
@@ -146,9 +136,31 @@ void showFrame(struct MP3File* mp3, char name[4]) {
             return;
         }
     }
+    printf("Error: there is no frame, named like this");
 }
 
-
+short setFrame(struct MP3File* mp3, char name[4], char* value) {
+    for (int i = 0; i < mp3->frameAmount; i++) {
+        if (strcmp(mp3->frames[i]->frameHeader->frameID, name) == 0) {
+            mp3->frames[i]->frameHeader->sizeBytes = getSize(strlen(value));
+            mp3->frames[i]->frameData = realloc(mp3->frames[i]->frameData, getSize(mp3->frames[i]->frameHeader->sizeBytes));
+            mp3->frames[i]->frameData = value;
+            return rewriteMP3(mp3);
+        }
+    }
+    mp3->frameAmount++;
+    mp3->frames = realloc(mp3->frames, mp3->frameAmount * sizeof(struct Frame));
+    mp3->frames[mp3->frameAmount - 1] = (struct Frame*) malloc(sizeof(struct Frame));
+    mp3->frames[mp3->frameAmount - 1]->frameHeader = (struct FrameHeader*) malloc(sizeof(struct FrameHeader));
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[0] = name[0];
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[1] = name[1];
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[2] = name[2];
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[3] = name[3];
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->sizeBytes = getSize(strlen(value));
+    mp3->frames[mp3->frameAmount - 1]->frameHeader->flags = 0;
+    mp3->frames[mp3->frameAmount - 1]->frameData = value;
+    return rewriteMP3(mp3);
+}
 
 int main(int argc, char* argv[]) {
     char commands[10][20] = {};
@@ -181,12 +193,11 @@ int main(int argc, char* argv[]) {
             }
         } else if (strcmp(commands[i], "--set") == 0){
             if (strlen(arguments[i]) == 4) {
-                //setFrame(mp3, arguments[i], arguments[i + 1]);
+                setFrame(mp3, arguments[i], arguments[i + 1]);
             } else {
                 printf("Error: incorrect frame name");
             }
         }
     }
-    freeMP3(mp3);
     return 0;
 }
