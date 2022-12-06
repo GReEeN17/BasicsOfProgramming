@@ -3,4 +3,4 @@ project(BasicsOfProgramming C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(BasicsOfProgramming main.c LAB_13/MP3ID3V2.c)
+add_executable(BasicsOfProgramming main.c LAB_13/MP3ID3V2.c LAB_14/game_of_life.c)
