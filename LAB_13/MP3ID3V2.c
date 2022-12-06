@@ -148,18 +148,6 @@ short setFrame(struct MP3File* mp3, char name[4], char* value) {
             return rewriteMP3(mp3);
         }
     }
-    mp3->frameAmount++;
-    mp3->frames = realloc(mp3->frames, mp3->frameAmount * sizeof(struct Frame));
-    mp3->frames[mp3->frameAmount - 1] = (struct Frame*) malloc(sizeof(struct Frame));
-    mp3->frames[mp3->frameAmount - 1]->frameHeader = (struct FrameHeader*) malloc(sizeof(struct FrameHeader));
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[0] = name[0];
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[1] = name[1];
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[2] = name[2];
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->frameID[3] = name[3];
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->sizeBytes = getSize(strlen(value));
-    mp3->frames[mp3->frameAmount - 1]->frameHeader->flags = 0;
-    mp3->frames[mp3->frameAmount - 1]->frameData = value;
-    return rewriteMP3(mp3);
 }
 
 int main(int argc, char* argv[]) {
