@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma push (1)
+#pragma pack(push, 1)
+
 struct ID3V2Header {
     char ID3[3];
     char version[2];
@@ -36,7 +37,8 @@ struct MP3File {
     unsigned dataSize;
     char* data;
 };
-#pragma pop;
+
+#pragma pack(pop)
 
 unsigned int getSize(unsigned sizeBytes) {
     return ((sizeBytes >> 24) & 0x000000ff) | ((sizeBytes >> 8) & 0x0000ff00) | ((sizeBytes << 8) & 0x00ff0000) | ((sizeBytes << 24) & 0xff000000);
@@ -61,7 +63,7 @@ struct MP3File* readInf(char* fileName) {
     mp3->fileName = fileName;
     mp3->header = (struct ID3V2Header*) malloc(sizeof(struct ID3V2Header));
     fread(mp3->header, sizeof(struct ID3V2Header), 1, file);
-    if (mp3->header->flags >> 6 != 0) {
+    if (mp3->header->flags >> 6 % 2) {
         mp3->extendedHeader = (struct ID3V2ExtendedHeader*) malloc(sizeof(struct ID3V2ExtendedHeader));
         fread(mp3->extendedHeader, sizeof(struct ID3V2ExtendedHeader), 1, file);
     } else {
@@ -77,6 +79,7 @@ struct MP3File* readInf(char* fileName) {
         if (!isFrameCorrect(currentFrame->frameHeader)) break;
         unsigned frameDataSize = getSize(currentFrame->frameHeader->sizeBytes);
         currentFrame->frameData = (char*) malloc(frameDataSize);
+        fread(currentFrame->frameData, 1, frameDataSize, file);
         mp3->frameAmount++;
         mp3->frames = realloc(mp3->frames, mp3->frameAmount * sizeof(struct Frame));
         mp3->frames[mp3->frameAmount - 1] = currentFrame;
@@ -121,7 +124,7 @@ void freeMP3 (struct MP3File* mp3) {
 void printFrameInf(struct Frame* frame) {
     for (int i = 0; i < getSize(frame->frameHeader->sizeBytes); i++) {
         if (frame->frameData[i] >= 32 && frame->frameData[i] <= 126) {
-            printf("$c", frame->frameData[i]);
+            printf("%c", frame->frameData[i]);
         }
     }
     printf("\n");
@@ -140,7 +143,7 @@ void showFrame(struct MP3File* mp3, char name[4]) {
     for (int i = 0; i < mp3->frameAmount; i++) {
         if (strcmp(mp3->frames[i]->frameHeader->frameID, name) == 0) {
             printFrameInf(mp3->frames[i]);
-            break;
+            return;
         }
     }
 }
@@ -184,5 +187,6 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+    freeMP3(mp3);
     return 0;
 }
