@@ -136,6 +136,17 @@ void showFrames(struct MP3File* mp3) {
     }
 }
 
+void showFrame(struct MP3File* mp3, char name[4]) {
+    for (int i = 0; i < mp3->frameAmount; i++) {
+        if (strcmp(mp3->frames[i]->frameHeader->frameID, name) == 0) {
+            printFrameInf(mp3->frames[i]);
+            break;
+        }
+    }
+}
+
+
+
 int main(int argc, char* argv[]) {
     char commands[10][20] = {};
     char arguments[10][50] = {};
@@ -167,7 +178,7 @@ int main(int argc, char* argv[]) {
             }
         } else if (strcmp(commands[i], "--set") == 0){
             if (strlen(arguments[i]) == 4) {
-                setFrame(mp3, arguments[i], arguments[i + 1]);
+                //setFrame(mp3, arguments[i], arguments[i + 1]);
             } else {
                 printf("Error: incorrect frame name");
             }
