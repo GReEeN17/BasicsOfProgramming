@@ -76,19 +76,47 @@ struct MP3File* readInf(char* fileName) {
         fread(currentFrame->frameHeader, sizeof(struct FrameHeader), 1, file);
         if (!isFrameCorrect(currentFrame->frameHeader)) break;
         unsigned frameDataSize = getSize(currentFrame->frameHeader->sizeBytes);
-        currentFrame->frameData = (char*) malloc(frameDataSize * sizeof(char));
+        currentFrame->frameData = (char*) malloc(frameDataSize);
         mp3->frameAmount++;
         mp3->frames = realloc(mp3->frames, mp3->frameAmount * sizeof(struct Frame));
         mp3->frames[mp3->frameAmount - 1] = currentFrame;
     }
     mp3->dataSize = headerSize + sizeof(struct ID3V2Header) - ftell(file);
-    mp3->data = (char*) malloc(mp3->dataSize * sizeof(char));
-    fread(mp3->data, sizeof(char), mp3->dataSize, file);
+    mp3->data = (char*) malloc(mp3->dataSize);
+    fread(mp3->data, 1, mp3->dataSize, file);
     fclose(file);
     return mp3;
 }
 
+short rewriteMP3 (struct MP3File* mp3) {
+    FILE* file = fopen(mp3->fileName, "r+b");
+    if (file == NULL) {
+        return 0;
+    }
+    fwrite(mp3->header, sizeof(struct ID3V2Header), 1, file);
+    if (mp3->extendedHeader != NULL) {
+        fwrite(mp3->extendedHeader, sizeof(struct ID3V2ExtendedHeader), 1, file);
+    }
+    for (int i = 0; i < mp3->frameAmount; i++) {
+        fwrite(mp3->frames[i]->frameHeader, sizeof(struct FrameHeader), 1, file);
+        fwrite(mp3->frames[i]->frameData,  getSize(mp3->frames[i]->frameHeader->sizeBytes), 1, file);
+    }
+    fwrite(mp3->data, 1, mp3->dataSize, file);
+    fclose(file);
+}
 
+void freeMP3 (struct MP3File* mp3) {
+    free(mp3->header);
+    free(mp3->extendedHeader);
+    for (int i = 0; i < mp3->frameAmount; i++) {
+        free(mp3->frames[i]->frameHeader);
+        free(mp3->frames[i]->frameData);
+        free(mp3->frames[i]);
+    }
+    free(mp3->frames);
+    free(mp3->data);
+    free(mp3);
+}
 
 int main(int argc, char* argv[]) {
     char commands[10][20] = {};
