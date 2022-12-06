@@ -118,6 +118,24 @@ void freeMP3 (struct MP3File* mp3) {
     free(mp3);
 }
 
+void printFrameInf(struct Frame* frame) {
+    for (int i = 0; i < getSize(frame->frameHeader->sizeBytes); i++) {
+        if (frame->frameData[i] >= 32 && frame->frameData[i] <= 126) {
+            printf("$c", frame->frameData[i]);
+        }
+    }
+    printf("\n");
+}
+
+void showFrames(struct MP3File* mp3) {
+    for (int i = 0; i < mp3->frameAmount; i++) {
+        printf("%s:\t", mp3->frames[i]->frameHeader->frameID);
+        if (getSize(mp3->frames[i]->frameHeader->sizeBytes) <= 100) {
+            printFrameInf(mp3->frames[i]);
+        }
+    }
+}
+
 int main(int argc, char* argv[]) {
     char commands[10][20] = {};
     char arguments[10][50] = {};
