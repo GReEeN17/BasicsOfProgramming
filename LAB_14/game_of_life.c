@@ -62,6 +62,9 @@ void writeBMP(struct BMPFile* bmp) {
 
 void freeBMPFile (struct BMPFile* bmp) {
     if (bmp){
+        free(bmp->bitMapInfoHeader);
+        free(bmp->bitMapFileHeader);
+        free(bmp->image);
         free(bmp);
     }
 }
@@ -72,6 +75,77 @@ void printImage(struct BMPFile* bmp) {
             printf("\n%04x: ", i);
         }
         printf("%02x ", bmp->image[i]);
+    }
+}
+
+int threeNeighLT (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int threeNeighRT (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int threeNeighLB (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int threeNeighRB (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int fiveNeighL (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int fiveNeighR (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int fiveNeighT (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int fiveNeighB (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+int eightNeigh (struct BMPFile* bmp, unsigned char* image, int i) {
+    return 0;
+}
+
+struct BMPFile* makeNewBmp (struct BMPFile* bmp, char* inputFile, char* outputFile) {
+    struct BMPFile* bmp_out = (struct BMPFile*) malloc(sizeof(struct BMPFile));
+    bmp_out->bitMapFileHeader = bmp->bitMapFileHeader;
+    bmp_out->bitMapInfoHeader = bmp->bitMapInfoHeader;
+    bmp_out->image = (unsigned char*) malloc(bmp_out->bitMapFileHeader->size - bmp_out->bitMapFileHeader->offsetBits);
+    int count_h = 0, count_w = 0;
+    for (int i = 0; i < bmp->bitMapFileHeader->size - bmp->bitMapFileHeader->offsetBits; i++) {
+        if (count_h == 0 && count_w == 0) {
+            threeNeighLT(bmp_out, bmp->image, i);
+        } else if (count_h == bmp->bitMapInfoHeader->height - 1 && count_w == bmp->bitMapInfoHeader->width - 1) {
+            threeNeighRB(bmp_out, bmp->image, i);
+        } else if (count_w == 0 && count_h == bmp->bitMapInfoHeader->height - 1) {
+            threeNeighLB(bmp_out, bmp->image, i);
+        } else if (count_h == 0 && count_w == bmp->bitMapInfoHeader->width - 1) {
+            threeNeighRT(bmp_out, bmp->image, i);
+        } else if (count_w == 0) {
+            fiveNeighL(bmp_out, bmp->image, i);
+        } else if (count_h == 0) {
+            fiveNeighT(bmp_out, bmp->image, i);
+        } else if (count_w == bmp->bitMapInfoHeader->width - 1) {
+            fiveNeighR(bmp_out, bmp->image, i);
+        } else if (count_h == bmp->bitMapInfoHeader->height - 1) {
+            fiveNeighB(bmp_out, bmp->image, i);
+        } else {
+            eightNeigh(bmp_out, bmp->image, i);
+        }
+        if (count_w == bmp->bitMapInfoHeader->width - 1) {
+            count_w = 0;
+            count_h++;
+        } else {
+            count_w++;
+        }
     }
 }
 
