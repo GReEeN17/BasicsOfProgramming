@@ -91,5 +91,49 @@ void freeBMPFile (struct BMPFile* bmp) {
     }
 }
 
+int main(int argc, char* argv[]) {
+    char* inputFile = NULL;
+    char* outputFile = NULL;
+    int maxIter = 10000000;
+    int dumpFreq = 1;
+    if (argc < 5) {
+        printf("Error: invalid amount of arguments");
+        return -1;
+    }
+    for (int i = 1; i < argc; i += 2) {
+        if (strcmp(argv[i], "--input") == 0) {
+            if (i + 1 < argc) {
+                inputFile = argv[i + 1];
+            } else {
+                printf("Error: invalid parameter --input");
+            }
+        } else if (strcmp(argv[i], "--output") == 0) {
+            if (i + 1 < argc) {
+                outputFile = argv[i + 1];
+            } else {
+                printf("Error: invalid parameter --output");
+            }
+        } else if (strcmp(argv[i], "--max_iter") == 0) {
+            if (i + 1 < argc) {
+                maxIter = atoi(argv[i + 1]);
+            } else {
+                printf("Error: invalid parameter --max_iter");
+            }
+        } else if (strcmp(argv[i], "--dump_freq") == 0) {
+            if (i + 1 < argc) {
+                dumpFreq = atoi(argv[i + 1]);
+            } else {
+                printf("Error: invalid parameter --dump_freq");
+            }
+        }
+    }
+    if (inputFile == NULL || outputFile == NULL) {
+        printf("Error: please incert input and output files");
+        return -1;
+    }
+    struct BMPFile* bmp = readBMP(inputFile);
+    return 0;
+}
+
 
 
