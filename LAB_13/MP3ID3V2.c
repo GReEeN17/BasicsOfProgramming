@@ -150,7 +150,7 @@ short setFrame(struct MP3File* mp3, char name[4], char* value) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int mp3(int argc, char* argv[]) {
     char commands[10][20] = {};
     char arguments[10][50] = {};
     int ind_in_argv;
