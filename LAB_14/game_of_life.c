@@ -89,39 +89,39 @@ void setByte (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i, int neigh)
     bmp_out->image[i + 3] = bmp_in->image[i + 3];
 }
 
-void threeNeighLT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void threeNeighLT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
+
+}
+
+void threeNeighRT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void threeNeighRT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void threeNeighLB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void threeNeighLB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void threeNeighRB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void threeNeighRB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void fiveNeighL (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void fiveNeighL (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void fiveNeighR (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void fiveNeighR (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void fiveNeighT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void fiveNeighT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void fiveNeighB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
-void fiveNeighB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
-    return;
-}
-
-void eightNeigh (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+void eightNeigh (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
     return;
 }
 
@@ -133,23 +133,23 @@ struct BMPFile* makeNewBmp (struct BMPFile* bmp, char* inputFile, char* outputFi
     int count_h = 0, count_w = 0;
     for (int i = 0; i < bmp->bitMapFileHeader->size - bmp->bitMapFileHeader->offsetBits; i += 4) {
         if (count_h == 0 && count_w == 0) {
-            threeNeighLT(bmp, bmp_out, bmp->image, i);
+            threeNeighLT(bmp, bmp_out, i);
         } else if (count_h == bmp->bitMapInfoHeader->height - 1 && count_w == bmp->bitMapInfoHeader->width - 1) {
-            threeNeighRB(bmp, bmp_out, bmp->image, i);
+            threeNeighRB(bmp, bmp_out, i);
         } else if (count_w == 0 && count_h == bmp->bitMapInfoHeader->height - 1) {
-            threeNeighLB(bmp, bmp_out, bmp->image, i);
+            threeNeighLB(bmp, bmp_out, i);
         } else if (count_h == 0 && count_w == bmp->bitMapInfoHeader->width - 1) {
-            threeNeighRT(bmp, bmp_out, bmp->image, i);
+            threeNeighRT(bmp, bmp_out, i);
         } else if (count_w == 0) {
-            fiveNeighL(bmp, bmp_out, bmp->image, i);
+            fiveNeighL(bmp, bmp_out, i);
         } else if (count_h == 0) {
-            fiveNeighT(bmp, bmp_out, bmp->image, i);
+            fiveNeighT(bmp, bmp_out, i);
         } else if (count_w == bmp->bitMapInfoHeader->width - 1) {
-            fiveNeighR(bmp, bmp_out, bmp->image, i);
+            fiveNeighR(bmp, bmp_out, i);
         } else if (count_h == bmp->bitMapInfoHeader->height - 1) {
-            fiveNeighB(bmp, bmp_out, bmp->image, i);
+            fiveNeighB(bmp, bmp_out, i);
         } else {
-            eightNeigh(bmp, bmp_out, bmp->image, i);
+            eightNeigh(bmp, bmp_out, i);
         }
         if (count_w == bmp->bitMapInfoHeader->width - 1) {
             count_w = 0;
