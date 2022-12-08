@@ -90,42 +90,74 @@ void setByte (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i, int neigh)
 }
 
 void threeNeighLT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-
+    int countNei = (bmp_in->image[i + 4] + 1) % 2 + (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 + (bmp_in->image[i + bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void threeNeighRT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 + (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 + (bmp_in->image[i - bmp_in->bitMapInfoHeader->width - 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void threeNeighLB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i + 4] + 1) % 2 + (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 + (bmp_in->image[i - bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void threeNeighRB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 + (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 + (bmp_in->image[i + bmp_in->bitMapInfoHeader->width - 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void fiveNeighL (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i + 4] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+            (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width + 4] + 1) % 2 +
+            (bmp_in->image[i - bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void fiveNeighR (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+            (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width - 4] + 1) % 2 +
+            (bmp_in->image[i - bmp_in->bitMapInfoHeader->width - 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void fiveNeighT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 +
+            (bmp_in->image[i + 4] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width - 4] + 1) % 2 +
+            (bmp_in->image[i + bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void fiveNeighB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 +
+                   (bmp_in->image[i + 4] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width - 4] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
 void eightNeigh (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i) {
-    return;
+    int countNei = (bmp_in->image[i - 4] + 1) % 2 +
+                   (bmp_in->image[i + 4] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+                   (bmp_in->image[i + bmp_in->bitMapInfoHeader->width] + 1) % 2 +
+                   (bmp_in->image[i + bmp_in->bitMapInfoHeader->width - 4] + 1) % 2 +
+                   (bmp_in->image[i + bmp_in->bitMapInfoHeader->width + 4] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width - 4] + 1) % 2 +
+                   (bmp_in->image[i - bmp_in->bitMapInfoHeader->width + 4] + 1) % 2;
+    setByte(bmp_in, bmp_out, i, countNei);
 }
 
-struct BMPFile* makeNewBmp (struct BMPFile* bmp, char* inputFile, char* outputFile) {
+struct BMPFile* makeNewBmp (struct BMPFile* bmp) {
     struct BMPFile* bmp_out = (struct BMPFile*) malloc(sizeof(struct BMPFile));
     bmp_out->bitMapFileHeader = bmp->bitMapFileHeader;
     bmp_out->bitMapInfoHeader = bmp->bitMapInfoHeader;
@@ -201,6 +233,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     struct BMPFile* bmp = readBMP(inputFile);
+    printImage(bmp);
+    bmp = makeNewBmp(bmp);
     printImage(bmp);
     return 0;
 }
