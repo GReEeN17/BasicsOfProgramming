@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+//Для этой программы важно, чтобы bmp был с альфа каналом
+
 #pragma pack(push, 1)
 
 struct BitMapFileHeader {
@@ -78,40 +80,49 @@ void printImage(struct BMPFile* bmp) {
     }
 }
 
-int threeNeighLT (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void setByte (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i, int neigh) {
+    if (neigh >= 2 && neigh <= 3) {
+        bmp_out->image[i] = 0; bmp_out->image[i + 1] = 0; bmp_out->image[i + 2] = 0;
+    } else {
+        bmp_out->image[i] = 255; bmp_out->image[i + 1] = 255; bmp_out->image[i + 2] = 0;
+    }
+    bmp_out->image[i + 3] = bmp_in->image[i + 3];
 }
 
-int threeNeighRT (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void threeNeighLT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int threeNeighLB (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void threeNeighRT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int threeNeighRB (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void threeNeighLB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int fiveNeighL (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void threeNeighRB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int fiveNeighR (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void fiveNeighL (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int fiveNeighT (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void fiveNeighR (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int fiveNeighB (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void fiveNeighT (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
-int eightNeigh (struct BMPFile* bmp, unsigned char* image, int i) {
-    return 0;
+void fiveNeighB (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
+}
+
+void eightNeigh (struct BMPFile* bmp_in, struct BMPFile* bmp_out, unsigned char* image, int i) {
+    return;
 }
 
 struct BMPFile* makeNewBmp (struct BMPFile* bmp, char* inputFile, char* outputFile) {
@@ -120,25 +131,25 @@ struct BMPFile* makeNewBmp (struct BMPFile* bmp, char* inputFile, char* outputFi
     bmp_out->bitMapInfoHeader = bmp->bitMapInfoHeader;
     bmp_out->image = (unsigned char*) malloc(bmp_out->bitMapFileHeader->size - bmp_out->bitMapFileHeader->offsetBits);
     int count_h = 0, count_w = 0;
-    for (int i = 0; i < bmp->bitMapFileHeader->size - bmp->bitMapFileHeader->offsetBits; i++) {
+    for (int i = 0; i < bmp->bitMapFileHeader->size - bmp->bitMapFileHeader->offsetBits; i += 4) {
         if (count_h == 0 && count_w == 0) {
-            threeNeighLT(bmp_out, bmp->image, i);
+            threeNeighLT(bmp, bmp_out, bmp->image, i);
         } else if (count_h == bmp->bitMapInfoHeader->height - 1 && count_w == bmp->bitMapInfoHeader->width - 1) {
-            threeNeighRB(bmp_out, bmp->image, i);
+            threeNeighRB(bmp, bmp_out, bmp->image, i);
         } else if (count_w == 0 && count_h == bmp->bitMapInfoHeader->height - 1) {
-            threeNeighLB(bmp_out, bmp->image, i);
+            threeNeighLB(bmp, bmp_out, bmp->image, i);
         } else if (count_h == 0 && count_w == bmp->bitMapInfoHeader->width - 1) {
-            threeNeighRT(bmp_out, bmp->image, i);
+            threeNeighRT(bmp, bmp_out, bmp->image, i);
         } else if (count_w == 0) {
-            fiveNeighL(bmp_out, bmp->image, i);
+            fiveNeighL(bmp, bmp_out, bmp->image, i);
         } else if (count_h == 0) {
-            fiveNeighT(bmp_out, bmp->image, i);
+            fiveNeighT(bmp, bmp_out, bmp->image, i);
         } else if (count_w == bmp->bitMapInfoHeader->width - 1) {
-            fiveNeighR(bmp_out, bmp->image, i);
+            fiveNeighR(bmp, bmp_out, bmp->image, i);
         } else if (count_h == bmp->bitMapInfoHeader->height - 1) {
-            fiveNeighB(bmp_out, bmp->image, i);
+            fiveNeighB(bmp, bmp_out, bmp->image, i);
         } else {
-            eightNeigh(bmp_out, bmp->image, i);
+            eightNeigh(bmp, bmp_out, bmp->image, i);
         }
         if (count_w == bmp->bitMapInfoHeader->width - 1) {
             count_w = 0;
