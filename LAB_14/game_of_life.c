@@ -54,8 +54,15 @@ struct BMPFile* readBMP (char* fileName) {
     return bmp;
 }
 
-void writeBMP(struct BMPFile* bmp, char* filepath, int k) {
-    FILE* file = fopen(("%s/%s.bmp", filepath, (char*)k), "wb");
+void writeBMP(struct BMPFile* bmp, char* filepath, int fileNumber) {
+    char fileName[100];
+    strcpy(fileName, filepath);
+    strcat(fileName, "/");
+    char fileNumberStr[11];
+    sprintf(fileNumberStr, "%d", fileNumber);
+    strcat(fileName, fileNumberStr);
+    strcat(fileName, ".bmp");
+    FILE* file = fopen(fileName, "wb");
     if (file == NULL) {
         return;
     }
@@ -178,6 +185,15 @@ struct BMPFile* makeNewBmp (struct BMPFile* bmp) {
     bmp_out->bitMapFileHeader = bmp->bitMapFileHeader;
     bmp_out->bitMapInfoHeader = bmp->bitMapInfoHeader;
     bmp_out->image = (unsigned char*) malloc(bmp_out->bitMapFileHeader->size - bmp_out->bitMapFileHeader->offsetBits);
+    if (bmp_out->bitMapFileHeader->size - bmp_out->bitMapFileHeader->offsetBits == 4) {
+        bmp_out->image[0] = 255; bmp_out->image[1] = 255; bmp_out->image[2] = 255; bmp_out->image[3] = bmp->image[3];
+        return bmp_out;
+    }
+    if (bmp_out->bitMapFileHeader->size - bmp_out->bitMapFileHeader->offsetBits == 8) {
+        bmp_out->image[0] = 255; bmp_out->image[1] = 255; bmp_out->image[2] = 255; bmp_out->image[3] = bmp->image[3];
+        bmp_out->image[4] = 255; bmp_out->image[5] = 255; bmp_out->image[6] = 255; bmp_out->image[7] = bmp->image[7];
+        return bmp_out;
+    }
     int count_h = 0, count_w = 0;
     for (int i = 0; i < bmp->bitMapFileHeader->size - bmp->bitMapFileHeader->offsetBits; i += 4) {
         if (count_h == 0 && count_w == 0) {
@@ -211,7 +227,7 @@ struct BMPFile* makeNewBmp (struct BMPFile* bmp) {
 
 int main(int argc, char* argv[]) {
     char* inputFile;
-    char* outputFile;
+    char* outputDir;
     int maxIter = 10000000;
     int dumpFreq = 1;
     if (argc < 5) {
@@ -227,7 +243,7 @@ int main(int argc, char* argv[]) {
             }
         } else if (strcmp(argv[i], "--output") == 0) {
             if (i + 1 < argc) {
-                outputFile = argv[i + 1];
+                outputDir = argv[i + 1];
             } else {
                 printf("Error: invalid parameter --output");
             }
@@ -245,17 +261,19 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    if (inputFile == NULL || outputFile == NULL) {
+    if (inputFile == NULL || outputDir == NULL) {
         printf("Error: please incert input and output files");
         return -1;
     }
     struct BMPFile* bmp = readBMP(inputFile);
-    bmp = makeNewBmp(bmp);
-    printf("%d", 1 % 1);
-    /*for (int i = 1; i < maxIter; i++) {
-
-    }*/
-    //writeBMP(bmp);
+    for (int i = 1; i <= maxIter; i++) {
+        bmp = makeNewBmp(bmp);
+        if (dumpFreq == 1) {
+            writeBMP(bmp, outputDir, i);
+        } else if (i % dumpFreq == 1) {
+            writeBMP(bmp, outputDir, i);
+        }
+    }
     return 0;
 }
 
