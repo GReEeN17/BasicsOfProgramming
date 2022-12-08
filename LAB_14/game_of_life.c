@@ -84,7 +84,7 @@ void setByte (struct BMPFile* bmp_in, struct BMPFile* bmp_out, int i, int neigh)
     if (neigh >= 2 && neigh <= 3) {
         bmp_out->image[i] = 0; bmp_out->image[i + 1] = 0; bmp_out->image[i + 2] = 0;
     } else {
-        bmp_out->image[i] = 255; bmp_out->image[i + 1] = 255; bmp_out->image[i + 2] = 0;
+        bmp_out->image[i] = 255; bmp_out->image[i + 1] = 255; bmp_out->image[i + 2] = 255;
     }
     bmp_out->image[i + 3] = bmp_in->image[i + 3];
 }
@@ -190,6 +190,7 @@ struct BMPFile* makeNewBmp (struct BMPFile* bmp) {
             count_w++;
         }
     }
+    return bmp_out;
 }
 
 int main(int argc, char* argv[]) {
